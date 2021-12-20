@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>DetailActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+DetailActivity.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.example.remindme</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">android.content.Intent</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.Bundle</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.view.View</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.TextView</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">androidx.appcompat.app.AppCompatActivity</span><span class="s0">;</span>
+
+<span class="s0">public class </span><span class="s1">DetailActivity </span><span class="s0">extends </span><span class="s1">AppCompatActivity  {</span>
+    <span class="s0">public </span><span class="s1">TextView lbl_title</span><span class="s0">, </span><span class="s1">lbl_description</span><span class="s0">;</span>
+    <span class="s0">public </span><span class="s1">String title</span><span class="s0">, </span><span class="s1">content</span><span class="s0">;</span>
+    <span class="s1">@Override</span>
+    <span class="s0">protected void </span><span class="s1">onCreate(Bundle savedInstanceState) {</span>
+        <span class="s0">super</span><span class="s1">.onCreate(savedInstanceState)</span><span class="s0">;</span>
+        <span class="s1">setContentView(R.layout.activity_detail)</span><span class="s0">;</span>
+
+        <span class="s1">title = getIntent().getStringExtra(</span><span class="s2">&quot;title&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">content = getIntent().getStringExtra(</span><span class="s2">&quot;content&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">lbl_title = findViewById(R.id.lbl_title)</span><span class="s0">;</span>
+        <span class="s1">lbl_description = findViewById(R.id.lbl_description)</span><span class="s0">;</span>
+
+        <span class="s1">lbl_title.setText(title)</span><span class="s0">;</span>
+        <span class="s1">lbl_description.setText(content)</span><span class="s0">;</span>
+
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">onBackPressed(){</span>
+        <span class="s1">Intent i = </span><span class="s0">new </span><span class="s1">Intent(</span><span class="s0">this, </span><span class="s1">MainActivity.</span><span class="s0">class</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">startActivity(i)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+<span class="s1">}</span></pre>
+</body>
+</html>

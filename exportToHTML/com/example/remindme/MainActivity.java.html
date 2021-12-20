@@ -1,0 +1,340 @@
+<html>
+<head>
+<title>MainActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #808080;}
+.s3 { color: #6a8759;}
+.s4 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+MainActivity.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.example.remindme</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">android.app.AlarmManager</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.app.DatePickerDialog</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.app.Dialog</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.app.Notification</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.app.NotificationChannel</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.app.NotificationManager</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.app.PendingIntent</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.app.TimePickerDialog</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.content.BroadcastReceiver</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.content.Context</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.content.Intent</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.content.SharedPreferences</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.graphics.drawable.BitmapDrawable</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.media.RingtoneManager</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.Build</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.Bundle</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.SystemClock</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.text.format.DateFormat</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.util.Log</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.view.View</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.Button</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.CompoundButton</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.DatePicker</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.EditText</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.Switch</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.TimePicker</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.Toast</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">androidx.appcompat.app.AppCompatActivity</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">androidx.core.app.NotificationCompat</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">androidx.core.app.NotificationManagerCompat</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">androidx.fragment.app.DialogFragment</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">com.allyants.notifyme.NotifyMe</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">java.text.SimpleDateFormat</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.Calendar</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.Locale</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.concurrent.TimeUnit</span><span class="s0">;</span>
+
+<span class="s0">import static </span><span class="s1">android.preference.PreferenceManager.getDefaultSharedPreferences</span><span class="s0">;</span>
+
+<span class="s0">public class </span><span class="s1">MainActivity </span><span class="s0">extends </span><span class="s1">AppCompatActivity {</span>
+
+    <span class="s0">public </span><span class="s1">EditText txt_title</span><span class="s0">;</span>
+    <span class="s0">public </span><span class="s1">EditText txt_description</span><span class="s0">;</span>
+    <span class="s0">public static </span><span class="s1">EditText txt_time</span><span class="s0">, </span><span class="s1">txt_date</span><span class="s0">;</span>
+
+    <span class="s1">Button btn_schedule</span><span class="s0">;</span>
+    <span class="s1">Switch swtch_imp</span><span class="s0">;</span>
+
+    <span class="s0">public static boolean </span><span class="s1">is_imp</span><span class="s0">;</span>
+
+    <span class="s2">//OnCreate methond of the activity</span>
+    <span class="s1">@Override</span>
+    <span class="s0">protected void </span><span class="s1">onCreate(Bundle savedInstanceState) {</span>
+        <span class="s0">super</span><span class="s1">.onCreate(savedInstanceState)</span><span class="s0">;</span>
+        <span class="s1">setContentView(R.layout.activity_main)</span><span class="s0">;</span>
+
+        <span class="s1">txt_title = findViewById(R.id.txt_title)</span><span class="s0">;</span>
+        <span class="s1">txt_description = findViewById(R.id.txt_description)</span><span class="s0">;</span>
+        <span class="s1">txt_time = findViewById(R.id.txt_time)</span><span class="s0">;</span>
+        <span class="s1">txt_date = findViewById(R.id.txt_date)</span><span class="s0">;</span>
+        <span class="s1">btn_schedule = findViewById(R.id.btn_schedule)</span><span class="s0">;</span>
+        <span class="s1">swtch_imp = (Switch) findViewById(R.id.swtch_imp)</span><span class="s0">;</span>
+
+        <span class="s1">swtch_imp.setOnCheckedChangeListener(</span><span class="s0">new </span><span class="s1">CompoundButton.OnCheckedChangeListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onCheckedChanged(CompoundButton compoundButton</span><span class="s0">, boolean </span><span class="s1">b) {</span>
+                <span class="s2">// Assign switch checked status to variable</span>
+                <span class="s1">is_imp = b</span><span class="s0">;</span>
+                <span class="s0">if </span><span class="s1">(b)</span>
+                    <span class="s1">Toast.makeText(MainActivity.</span><span class="s0">this, </span><span class="s3">&quot;important&quot;</span><span class="s0">, </span><span class="s1">Toast.LENGTH_SHORT).show()</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">})</span><span class="s0">;</span>
+
+        <span class="s1">txt_time.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() {</span>
+
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onClick(View v) {</span>
+                <span class="s2">// Open time picker on click</span>
+                <span class="s1">showTruitonTimePickerDialog(txt_time)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">})</span><span class="s0">;</span>
+
+        <span class="s1">txt_date.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() {</span>
+
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onClick(View v) {</span>
+                <span class="s2">// Open date picker on click</span>
+                <span class="s1">showTruitonDatePickerDialog(txt_date)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">})</span><span class="s0">;</span>
+        <span class="s1">btn_schedule.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onClick(View v) {</span>
+                <span class="s2">//Schedule button click</span>
+                <span class="s1">String title = txt_title.getText().toString()</span><span class="s0">;</span>
+                <span class="s1">String description = txt_description.getText().toString()</span><span class="s0">;</span>
+                <span class="s1">String date1 = txt_date.getText().toString()</span><span class="s0">;</span>
+                <span class="s1">String time = txt_time.getText().toString()</span><span class="s0">;</span>
+
+                <span class="s1">Calendar calendar = Calendar.getInstance()</span><span class="s0">;</span>
+                <span class="s1">calendar.set(datedialog.getDatePicker().getYear()</span><span class="s0">, </span><span class="s1">datedialog.getDatePicker().getMonth() + </span><span class="s4">1</span><span class="s0">, </span><span class="s1">datedialog.getDatePicker().getDayOfMonth()</span><span class="s0">,</span>
+                        <span class="s1">s_hour</span><span class="s0">, </span><span class="s1">s_min</span><span class="s0">, </span><span class="s4">0</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s0">long </span><span class="s1">futureTime = calendar.getTimeInMillis()</span><span class="s0">;</span>
+
+                <span class="s1">Calendar c = Calendar.getInstance()</span><span class="s0">;</span>
+
+
+                <span class="s0">long </span><span class="s1">sub = c2.getTimeInMillis() - c.getTimeInMillis()</span><span class="s0">;</span>
+
+                <span class="s2">//Validation start</span>
+                <span class="s0">if </span><span class="s1">(title.length() &lt;= </span><span class="s4">0</span><span class="s1">) {</span>
+                    <span class="s1">Toast.makeText(MainActivity.</span><span class="s0">this, </span><span class="s3">&quot;Please enter Title&quot;</span><span class="s0">, </span><span class="s1">Toast.LENGTH_SHORT).show()</span><span class="s0">;</span>
+                <span class="s1">} </span><span class="s0">else if </span><span class="s1">(description.length() &lt;= </span><span class="s4">0</span><span class="s1">) {</span>
+                    <span class="s1">Toast.makeText(MainActivity.</span><span class="s0">this, </span><span class="s3">&quot;Please enter Description&quot;</span><span class="s0">, </span><span class="s1">Toast.LENGTH_SHORT).show()</span><span class="s0">;</span>
+                <span class="s1">} </span><span class="s0">else if </span><span class="s1">(date1.length() &lt;= </span><span class="s4">0</span><span class="s1">) {</span>
+                    <span class="s1">Toast.makeText(MainActivity.</span><span class="s0">this, </span><span class="s3">&quot;Please enter Date&quot;</span><span class="s0">, </span><span class="s1">Toast.LENGTH_SHORT).show()</span><span class="s0">;</span>
+                <span class="s1">} </span><span class="s0">else if </span><span class="s1">(time.length() &lt;= </span><span class="s4">0</span><span class="s1">) {</span>
+                    <span class="s1">Toast.makeText(MainActivity.</span><span class="s0">this, </span><span class="s3">&quot;Please enter Time&quot;</span><span class="s0">, </span><span class="s1">Toast.LENGTH_SHORT).show()</span><span class="s0">;</span>
+                <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                    <span class="s0">if </span><span class="s1">(sub &lt;= </span><span class="s4">0</span><span class="s1">) {</span>
+                        <span class="s1">Toast.makeText(MainActivity.</span><span class="s0">this, </span><span class="s3">&quot;You can not select past time&quot;</span><span class="s0">, </span><span class="s1">Toast.LENGTH_SHORT).show()</span><span class="s0">;</span>
+                    <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                        <span class="s1">txt_date.setText(</span><span class="s3">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s1">txt_title.setText(</span><span class="s3">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s1">txt_time.setText(</span><span class="s3">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s1">txt_description.setText(</span><span class="s3">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s2">//If there is not any error with form, schedule notification</span>
+                        <span class="s0">boolean </span><span class="s1">is_imp = swtch_imp.isChecked()</span><span class="s0">;</span>
+                        <span class="s1">scheduleNotification(title</span><span class="s0">, </span><span class="s1">description</span><span class="s0">, </span><span class="s1">MainActivity.</span><span class="s0">this, </span><span class="s1">sub</span><span class="s0">, </span><span class="s4">1</span><span class="s0">, </span><span class="s1">futureTime</span><span class="s0">, </span><span class="s1">is_imp)</span><span class="s0">;</span>
+                        <span class="s1">Toast.makeText(MainActivity.</span><span class="s0">this, </span><span class="s3">&quot;Notification has been scheduled&quot;</span><span class="s0">, </span><span class="s1">Toast.LENGTH_SHORT).show()</span><span class="s0">;</span>
+
+                    <span class="s1">}</span>
+
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">})</span><span class="s0">;</span>
+
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">onPause() {</span>
+        <span class="s0">super</span><span class="s1">.onPause()</span><span class="s0">;</span>
+        <span class="s1">SharedPreferences sharedPreferences = getDefaultSharedPreferences(getApplicationContext())</span><span class="s0">;</span>
+        <span class="s1">SharedPreferences.Editor editor = sharedPreferences.edit()</span><span class="s0">;</span>
+        <span class="s1">editor.putString(</span><span class="s3">&quot;title&quot;</span><span class="s0">, </span><span class="s1">txt_title.getText().toString())</span><span class="s0">;</span>
+        <span class="s1">editor.putString(</span><span class="s3">&quot;description&quot;</span><span class="s0">, </span><span class="s1">txt_description.getText().toString())</span><span class="s0">;</span>
+        <span class="s1">editor.putString(</span><span class="s3">&quot;date1&quot;</span><span class="s0">, </span><span class="s1">txt_date.getText().toString())</span><span class="s0">;</span>
+        <span class="s1">editor.putString(</span><span class="s3">&quot;time&quot;</span><span class="s0">, </span><span class="s1">txt_time.getText().toString())</span><span class="s0">;</span>
+        <span class="s1">editor.putBoolean(</span><span class="s3">&quot;switch&quot;</span><span class="s0">,</span><span class="s1">swtch_imp.isChecked())</span><span class="s0">;</span>
+        <span class="s1">editor.commit()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static </span><span class="s1">DatePickerDialog datedialog</span><span class="s0">;</span>
+
+    <span class="s0">public static class </span><span class="s1">DatePickerFragment </span><span class="s0">extends </span><span class="s1">DialogFragment </span><span class="s0">implements</span>
+            <span class="s1">DatePickerDialog.OnDateSetListener {</span>
+
+        <span class="s1">@Override</span>
+        <span class="s0">public </span><span class="s1">Dialog onCreateDialog(Bundle savedInstanceState) {</span>
+            <span class="s2">// Use the current date as the default date in the picker</span>
+            <span class="s0">final </span><span class="s1">Calendar c = Calendar.getInstance()</span><span class="s0">;</span>
+            <span class="s0">int </span><span class="s1">year = c.get(Calendar.YEAR)</span><span class="s0">;</span>
+            <span class="s0">int </span><span class="s1">month = c.get(Calendar.MONTH)</span><span class="s0">;</span>
+            <span class="s0">int </span><span class="s1">day = c.get(Calendar.DAY_OF_MONTH)</span><span class="s0">;</span>
+
+            <span class="s2">// Create a new instance of DatePickerDialog and return it</span>
+            <span class="s1">datedialog = </span><span class="s0">new </span><span class="s1">DatePickerDialog(getContext()</span><span class="s0">, this, </span><span class="s1">year</span><span class="s0">, </span><span class="s1">month</span><span class="s0">, </span><span class="s1">day)</span><span class="s0">;</span>
+            <span class="s1">datedialog.getDatePicker().setMinDate(c.getTimeInMillis())</span><span class="s0">;</span>
+            <span class="s0">return </span><span class="s1">datedialog</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s0">public void </span><span class="s1">onDateSet(DatePicker view</span><span class="s0">, int </span><span class="s1">year</span><span class="s0">, int </span><span class="s1">month</span><span class="s0">, int </span><span class="s1">day) {</span>
+            <span class="s2">// Do something with the date chosen by the user</span>
+            <span class="s1">txt_date.setText(day + </span><span class="s3">&quot;/&quot; </span><span class="s1">+ (month + </span><span class="s4">1</span><span class="s1">) + </span><span class="s3">&quot;/&quot; </span><span class="s1">+ year)</span><span class="s0">;</span>
+
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static int </span><span class="s1">s_hour</span><span class="s0">, </span><span class="s1">s_min</span><span class="s0">;</span>
+    <span class="s0">public static </span><span class="s1">TimePickerDialog timePickerDialog</span><span class="s0">;</span>
+
+    <span class="s0">public static class </span><span class="s1">TimePickerFragment </span><span class="s0">extends </span><span class="s1">DialogFragment </span><span class="s0">implements</span>
+            <span class="s1">TimePickerDialog.OnTimeSetListener {</span>
+        <span class="s1">Calendar c</span><span class="s0">;</span>
+
+        <span class="s1">@Override</span>
+        <span class="s0">public </span><span class="s1">Dialog onCreateDialog(Bundle savedInstanceState) {</span>
+            <span class="s2">// Use the current time as the default values for the picker</span>
+            <span class="s1">c = Calendar.getInstance()</span><span class="s0">;</span>
+            <span class="s0">int </span><span class="s1">hour = c.get(Calendar.HOUR_OF_DAY)</span><span class="s0">;</span>
+            <span class="s0">int </span><span class="s1">minute = c.get(Calendar.MINUTE)</span><span class="s0">;</span>
+
+            <span class="s2">// Create a new instance of TimePickerDialog and return it</span>
+            <span class="s1">timePickerDialog = </span><span class="s0">new </span><span class="s1">TimePickerDialog(getActivity()</span><span class="s0">, this,</span>
+                    <span class="s1">c.get(Calendar.HOUR_OF_DAY)</span><span class="s0">, </span><span class="s1">c.get(Calendar.MINUTE)</span><span class="s0">, false</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">return </span><span class="s1">timePickerDialog</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s0">public void </span><span class="s1">onTimeSet(TimePicker view</span><span class="s0">, int </span><span class="s1">hourOfDay</span><span class="s0">, int </span><span class="s1">minute) {</span>
+
+            <span class="s1">txt_time.setText(hourOfDay + </span><span class="s3">&quot;:&quot; </span><span class="s1">+ minute)</span><span class="s0">;</span>
+            <span class="s1">s_hour = hourOfDay</span><span class="s0">;</span>
+            <span class="s1">s_min = minute</span><span class="s0">;</span>
+            <span class="s1">c2 = Calendar.getInstance()</span><span class="s0">;</span>
+            <span class="s1">c2.set(Calendar.HOUR_OF_DAY</span><span class="s0">, </span><span class="s1">hourOfDay)</span><span class="s0">;</span>
+            <span class="s1">c2.set(Calendar.MINUTE</span><span class="s0">, </span><span class="s1">minute)</span><span class="s0">;</span>
+            <span class="s1">c2.set(Calendar.SECOND</span><span class="s0">, </span><span class="s4">0</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static </span><span class="s1">Calendar c2</span><span class="s0">;</span>
+
+
+    <span class="s0">public void </span><span class="s1">showTruitonTimePickerDialog(View v) {</span>
+        <span class="s1">DialogFragment newFragment = </span><span class="s0">new </span><span class="s1">TimePickerFragment()</span><span class="s0">;</span>
+        <span class="s1">newFragment.show(getSupportFragmentManager()</span><span class="s0">, </span><span class="s3">&quot;timePicker&quot;</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">showTruitonDatePickerDialog(View v) {</span>
+        <span class="s1">DialogFragment newFragment = </span><span class="s0">new </span><span class="s1">DatePickerFragment()</span><span class="s0">;</span>
+        <span class="s1">newFragment.show(getSupportFragmentManager()</span><span class="s0">, </span><span class="s3">&quot;datePicker&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+    <span class="s1">}</span>
+
+
+    <span class="s0">public static </span><span class="s1">NotificationCompat.Builder builder</span><span class="s0">;</span>
+
+    <span class="s0">public void </span><span class="s1">scheduleNotification(String title</span><span class="s0">, </span><span class="s1">String content</span><span class="s0">, </span><span class="s1">Context context</span><span class="s0">, long </span><span class="s1">delay</span><span class="s0">, int </span><span class="s1">notificationId</span><span class="s0">, long </span><span class="s1">futuremilli</span><span class="s0">, boolean </span><span class="s1">is_imp) {</span><span class="s2">//delay is after how much time(in millis) from current time you want to schedule the notification</span>
+        <span class="s1">builder = </span><span class="s0">new </span><span class="s1">NotificationCompat.Builder(context)</span>
+                <span class="s1">.setContentTitle(title)</span>
+                <span class="s1">.setContentText(content)</span>
+                <span class="s1">.setAutoCancel(</span><span class="s0">true</span><span class="s1">)</span>
+                <span class="s1">.setSmallIcon(R.drawable.ic_one)</span>
+                <span class="s1">.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))</span><span class="s0">;</span>
+        <span class="s0">if </span><span class="s1">(is_imp) {</span>
+            <span class="s1">Log.e(</span><span class="s3">&quot;Main&quot;</span><span class="s0">, </span><span class="s3">&quot;in if&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">builder.setPriority(Notification.PRIORITY_MAX)</span><span class="s0">;</span>
+
+        <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+            <span class="s1">Log.e(</span><span class="s3">&quot;Main&quot;</span><span class="s0">, </span><span class="s3">&quot;in else&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">builder.setPriority(Notification.PRIORITY_LOW)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s1">Intent intent = </span><span class="s0">new </span><span class="s1">Intent(context</span><span class="s0">, </span><span class="s1">DetailActivity.</span><span class="s0">class</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">intent.putExtra(</span><span class="s3">&quot;title&quot;</span><span class="s0">, </span><span class="s1">title)</span><span class="s0">;</span>
+        <span class="s1">intent.putExtra(</span><span class="s3">&quot;content&quot;</span><span class="s0">, </span><span class="s1">content)</span><span class="s0">;</span>
+        <span class="s1">intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP)</span><span class="s0">;</span>
+        <span class="s1">PendingIntent activity = PendingIntent.getActivity(context</span><span class="s0">, </span><span class="s1">notificationId</span><span class="s0">, </span><span class="s1">intent</span><span class="s0">, </span><span class="s1">PendingIntent.FLAG_CANCEL_CURRENT)</span><span class="s0">;</span>
+        <span class="s1">builder.setContentIntent(activity)</span><span class="s0">;</span>
+
+        <span class="s1">Notification notification = builder.build()</span><span class="s0">;</span>
+
+        <span class="s1">Intent notificationIntent = </span><span class="s0">new </span><span class="s1">Intent(context</span><span class="s0">, </span><span class="s1">MyNotificationPublisher.</span><span class="s0">class</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">notificationIntent.putExtra(MyNotificationPublisher.NOTIFICATION_ID</span><span class="s0">, </span><span class="s1">notificationId)</span><span class="s0">;</span>
+        <span class="s1">notificationIntent.putExtra(MyNotificationPublisher.NOTIFICATION</span><span class="s0">, </span><span class="s1">notification)</span><span class="s0">;</span>
+        <span class="s1">notificationIntent.putExtra(</span><span class="s3">&quot;is_imp&quot;</span><span class="s0">, </span><span class="s1">is_imp)</span><span class="s0">;</span>
+        <span class="s1">PendingIntent pendingIntent = PendingIntent.getBroadcast(context</span><span class="s0">, </span><span class="s1">notificationId</span><span class="s0">, </span><span class="s1">notificationIntent</span><span class="s0">, </span><span class="s1">PendingIntent.FLAG_CANCEL_CURRENT)</span><span class="s0">;</span>
+
+        <span class="s0">long </span><span class="s1">futureInMillis = SystemClock.elapsedRealtime() + delay</span><span class="s0">;</span>
+
+        <span class="s1">AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE)</span><span class="s0">;</span>
+        <span class="s1">alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP</span><span class="s0">, </span><span class="s1">futureInMillis</span><span class="s0">, </span><span class="s1">pendingIntent)</span><span class="s0">;</span>
+
+    <span class="s1">}</span>
+
+
+    <span class="s1">@Override</span>
+    <span class="s0">protected void </span><span class="s1">onResume() {</span>
+        <span class="s0">super</span><span class="s1">.onResume()</span><span class="s0">;</span>
+        <span class="s1">SharedPreferences sharedPreferences= getDefaultSharedPreferences(getApplicationContext())</span><span class="s0">;</span>
+        <span class="s1">txt_title.setText(sharedPreferences.getString(</span><span class="s3">&quot;title&quot;</span><span class="s0">,</span><span class="s3">&quot;&quot;</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">txt_description.setText(sharedPreferences.getString(</span><span class="s3">&quot;description&quot;</span><span class="s0">,</span><span class="s3">&quot;&quot;</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">txt_date.setText(sharedPreferences.getString(</span><span class="s3">&quot;date1&quot;</span><span class="s0">,</span><span class="s3">&quot;&quot;</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">txt_time.setText(sharedPreferences.getString(</span><span class="s3">&quot;time&quot;</span><span class="s0">,</span><span class="s3">&quot;&quot;</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">swtch_imp.setChecked(sharedPreferences.getBoolean(</span><span class="s3">&quot;switch&quot;</span><span class="s0">,false</span><span class="s1">))</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static class </span><span class="s1">MyNotificationPublisher </span><span class="s0">extends </span><span class="s1">BroadcastReceiver {</span>
+
+        <span class="s0">public static </span><span class="s1">String NOTIFICATION_ID = </span><span class="s3">&quot;notification_id&quot;</span><span class="s0">;</span>
+        <span class="s0">public static </span><span class="s1">String NOTIFICATION = </span><span class="s3">&quot;notification&quot;</span><span class="s0">;</span>
+
+        <span class="s2">//onReceive method called on receiving the notification</span>
+        <span class="s1">@Override</span>
+        <span class="s0">public void </span><span class="s1">onReceive(</span><span class="s0">final </span><span class="s1">Context context</span><span class="s0">, </span><span class="s1">Intent intent) {</span>
+
+
+            <span class="s2">//Send notificiation</span>
+            <span class="s1">NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)</span><span class="s0">;</span>
+
+            <span class="s2">//Notification notification = intent.getParcelableExtra(NOTIFICATION);</span>
+            <span class="s2">//int notificationId = intent.getIntExtra(NOTIFICATION_ID, 0);</span>
+
+            <span class="s0">if </span><span class="s1">(Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) {</span>
+                <span class="s1">String channelId = </span><span class="s3">&quot;CH1&quot;</span><span class="s0">;</span>
+                <span class="s1">NotificationChannel channel</span><span class="s0">;</span>
+                <span class="s0">boolean </span><span class="s1">is_imp_inner = intent.getBooleanExtra(</span><span class="s3">&quot;is_imp&quot;</span><span class="s0">, false</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">Log.e(</span><span class="s3">&quot;Main&quot;</span><span class="s0">, </span><span class="s3">&quot;is_imp_inner &quot; </span><span class="s1">+ is_imp_inner)</span><span class="s0">;</span>
+                <span class="s0">if </span><span class="s1">(is_imp)</span>
+                <span class="s1">channel = </span><span class="s0">new </span><span class="s1">NotificationChannel(</span>
+                        <span class="s1">channelId</span><span class="s0">,</span>
+                        <span class="s3">&quot;Important&quot;</span><span class="s0">,</span>
+                        <span class="s1">NotificationManager.IMPORTANCE_HIGH)</span><span class="s0">;</span>
+                <span class="s0">else</span>
+                    <span class="s1">channel = </span><span class="s0">new </span><span class="s1">NotificationChannel(</span>
+                            <span class="s1">channelId</span><span class="s0">,</span>
+                            <span class="s3">&quot;low&quot;</span><span class="s0">,</span>
+                            <span class="s1">NotificationManager.IMPORTANCE_LOW)</span><span class="s0">;</span>
+
+                <span class="s1">notificationManager.createNotificationChannel(channel)</span><span class="s0">;</span>
+                <span class="s1">builder.setChannelId(channelId)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+            <span class="s1">notificationManager.notify(</span><span class="s4">0</span><span class="s0">, </span><span class="s1">builder.build())</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span></pre>
+</body>
+</html>
